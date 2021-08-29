@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
@@ -12,7 +11,8 @@ class App extends Component {
       keyword: '',
       type: 'artist'
     };
-    this.onValueChange = this.onValueChange.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
+    this.onTypeChange = this.onTypeChange.bind(this);
     this.getInputValue = this.getInputValue.bind(this);
     this.getInfo = this.getInfo.bind(this);
   }
@@ -21,14 +21,22 @@ class App extends Component {
     
   }
 
-  onValueChange(event) {
+  onTypeChange(event) {
     this.setState({
       type: event.target.value
     });
+    if(this.state.keyword.length > 1) this.getInputValue();
   }
 
-  getInputValue(event) {
-    event.preventDefault();
+  onInputChange(event) {
+    this.setState({
+      keyword: event.target.value
+    });
+    if(this.state.keyword.length > 1) this.getInputValue();
+  }
+
+  getInputValue() {
+    // event.preventDefault();
     var keyword = document.getElementById("input").value;
     var type = document.querySelector('input[name="type"]:checked').value;
     this.setState({keyword: keyword, type: type});
@@ -36,21 +44,23 @@ class App extends Component {
   }
 
   getInfo(keyword, type) {
-    fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=10', {
+    fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=5', {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        //authorization: 'Bearer F5MKSIpHAt9ukR7tWo9vdg==!',
+        // authorization: 'BearF5MKSIpHAt9ukR7tWo9vdg==',
       },
     })
       .then(res => res.json())
       .then(
         (result) => {
-          this.setState({
-            isLoaded: true,
-            items: result[type+'s'].data
-          });
-          console.log(result)
+          if(!result.error) {
+            this.setState({
+              isLoaded: true,
+              items: result[type+'s'].data
+            });
+            console.log(result)
+          }
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -74,27 +84,29 @@ class App extends Component {
       result = (<div>Loading...</div>);
     } else {
       result = (
-        <ul>
+        <div>
           {items.map(item => (
-            <li key={item.id}>
-              <span>{item.name} {item.url}</span>
-              <img src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="100" />
-            </li>
+            <a key={item.id} href={item.url} target='_blank' rel="noreferrer">
+              <div className="flex items-center pa3">
+                <img alt="cover" className="pa2" src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="100" />
+                <span className="pa2">{item.name}</span>
+              </div>
+            </a>
           ))}
-        </ul>
+        </div>
       )
     }
     return (
       <main>
         <form action="javascript:void(0);">
-          <input id="input" type="text" placeholder="輸入歌手名稱"/>
-            <input type="radio" id="artist" name="type" value="artist" onChange={this.onValueChange} checked={this.state.type === "artist"}/>
+          <input id="input" type="text" placeholder="輸入歌手名稱" autoComplete="off" onChange={this.onInputChange}/>
+            <input type="radio" id="artist" name="type" value="artist" onChange={this.onTypeChange} checked={this.state.type === "artist"}/>
             <label>歌手</label>
-            <input type="radio" id="album" name="type" value="album" onChange={this.onValueChange} checked={this.state.type === "album"}/>
+            <input type="radio" id="album" name="type" value="album" onChange={this.onTypeChange} checked={this.state.type === "album"}/>
             <label>專輯</label>
-            <input type="radio" id="track" name="type" value="track" onChange={this.onValueChange} checked={this.state.type === "track"}/>
+            <input type="radio" id="track" name="type" value="track" onChange={this.onTypeChange} checked={this.state.type === "track"}/>
             <label className="mr2">歌曲</label>
-          <input type="submit" value="搜尋" onClick={this.getInputValue}/>
+          {/*<input type="submit" value="搜尋" onClick={this.getInputValue}/>*/}
         </form>
         {result}
       </main>
