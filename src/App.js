@@ -20,7 +20,8 @@ class App extends Component {
       items: [],
       keyword: '',
       type: 'artist',
-      current: null
+      current: null,
+      cardType: ''
     };
     this.selectCard = this.selectCard.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
@@ -62,6 +63,7 @@ class App extends Component {
   }
 
   getInfo(keyword, type) {
+    $('#results').addClass('hide');
     fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=10', {
       method: 'GET',
       headers: {
@@ -73,11 +75,16 @@ class App extends Component {
       .then(
         (result) => {
           if(!result.error) {
-            this.setState({
-              isLoaded: true,
-              items: result[type+'s'].data
-            });
-            console.log(result)
+            var $t = this;
+            setTimeout(function(){
+              $t.setState({
+                isLoaded: true,
+                items: result[type+'s'].data,
+                cardType: type
+              });
+              console.log(result)
+              $('#results').removeClass('hide');
+            },100)
           }
         },
         // Note: it's important to handle errors here
@@ -107,13 +114,13 @@ class App extends Component {
         </div>);
     } else {
       result = items.length > 1 ? (
-        <div>
+        <div id="results">
           {items.map(item => (
             <div key={item.id} className="card flex items-center pa3 mv2 br3 mr3" onClick={(e) => this.selectCard(e, item)}>
-              <img alt="cover" className="br2" src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="50" />
+              <img alt="cover" className="br2" src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="80" />
               <div className="dib ph3">
                 <p className="primary ma0">{item.name}</p>
-                <p className="secondary ma0">{type[this.state.type]}</p>
+                <p className="secondary ma0">{type[this.state.cardType]}</p>
               </div>
             </div>
           ))}
