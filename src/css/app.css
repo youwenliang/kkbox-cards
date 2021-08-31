@@ -18,6 +18,37 @@ main {
 	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
 }
 
+.card {
+	cursor: pointer;
+	background-color: white;
+	transition: all .2s ease-in-out;
+}
+
+.card .primary {
+	color: #232323;
+	font-size: 16px;
+	line-height: 22px;
+}
+
+.card .secondary {
+	color: #7D7D7D;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.card * {
+	pointer-events: none;
+}
+
+.card:hover {
+	background-color: #f2f2f2;
+}
+
+.card.active {
+	background-color: #f2f2f2;
+	box-shadow: 0 0 0 2px #09cef6;
+}
+
 input:focus, textarea:focus, select:focus{
     outline: none;
 }
@@ -52,6 +83,7 @@ input[type='radio'] + label {
 	background-color: #fff;
 	padding: 12px 0;
 	position: relative;
+	transition: all .2s ease-in-out;
 }
 
 input[type='radio'] + label:hover {
@@ -61,7 +93,6 @@ input[type='radio'] + label:hover {
 input[type='radio']:checked + label {
 	box-shadow: inset 0 -4px 0 0px #09cef6;
 	background-color: #fff;
-    border-color: #428bca;
 	z-index: 1;
 	color: #09cef6;
 }

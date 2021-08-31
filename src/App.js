@@ -3,6 +3,13 @@ import './App.css';
 import logo from './images/logo.png';
 import search from './images/ic_search_24.svg';
 import question from './images/ic_faq_20.svg';
+import $ from 'jquery';
+
+var type = {
+  'artist': '歌手',
+  'track': '歌曲',
+  'album': '專輯',
+}
 
 class App extends Component {
   constructor(props) {
@@ -12,8 +19,10 @@ class App extends Component {
       isLoaded: false,
       items: [],
       keyword: '',
-      type: 'artist'
+      type: 'artist',
+      current: null
     };
+    this.selectCard = this.selectCard.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
     this.getInputValue = this.getInputValue.bind(this);
@@ -22,6 +31,12 @@ class App extends Component {
 
   componentDidMount() {
     
+  }
+
+  selectCard(event, i) {
+    this.setState({current: i});
+    $('.active').removeClass('active');
+    event.target.classList.add('active');
   }
 
   onTypeChange(event) {
@@ -94,12 +109,13 @@ class App extends Component {
       result = items.length > 1 ? (
         <div>
           {items.map(item => (
-            <a key={item.id} href={item.url} target='_blank' rel="noreferrer">
-              <div className="flex items-center pa3">
-                <img alt="cover" className="pa2" src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="100" />
-                <span className="pa2">{item.name}</span>
+            <div key={item.id} className="card flex items-center pa3 mv2 br3 mr3" onClick={(e) => this.selectCard(e, item)}>
+              <img alt="cover" className="br2" src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="50" />
+              <div className="dib ph3">
+                <p className="primary ma0">{item.name}</p>
+                <p className="secondary ma0">{type[this.state.type]}</p>
               </div>
-            </a>
+            </div>
           ))}
         </div>
       ):(
@@ -138,7 +154,7 @@ class App extends Component {
               </div>
             </div>
           </form>
-          <div className="overflow-y-scroll overflow-x-hidden pl3">
+          <div className="overflow-y-scroll overflow-x-hidden pl3 pt2">
             {result}
           </div>
         </section>
