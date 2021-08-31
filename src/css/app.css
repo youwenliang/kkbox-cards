@@ -1,1 +1,67 @@
 @import "tachyons";
+
+body {
+	font-family: 'PingFang TC', sans-serif;
+}
+
+main {
+	display: flex;
+	background-color: #f2f2f2;
+}
+
+#canvas {
+	flex-grow: 1;
+}
+
+#side {
+	width: 360px;
+	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
+}
+
+input:focus, textarea:focus, select:focus{
+    outline: none;
+}
+
+input[type=text] {
+  	background-color: rgba(118,118,128,.12);
+  	color: #111111;
+  	border: none;
+  	border-radius: 10px;
+  	padding: 16px 16px 16px 44px;
+}
+
+input[type=text] + img {
+	top: calc(50% - 12px);
+    left: 44px;
+}
+
+input[type='radio'] {
+	position: absolute;
+	left: -99999em;
+	top: -99999em;
+}
+
+input[type='radio'] + label {
+	font-size: 18px;
+	line-height: 20px;
+	font-weight: 600;
+	color: #232323;
+	cursor: pointer;
+	float: left;
+	border-bottom: 0;
+	background-color: #fff;
+	padding: 12px 0;
+	position: relative;
+}
+
+input[type='radio'] + label:hover {
+    background-color: #eee;
+}
+
+input[type='radio']:checked + label {
+	box-shadow: inset 0 -4px 0 0px #09cef6;
+	background-color: #fff;
+    border-color: #428bca;
+	z-index: 1;
+	color: #09cef6;
+}

@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
+import logo from './images/logo.png';
+import search from './images/ic_search_24.svg';
+import question from './images/ic_faq_20.svg';
 
 class App extends Component {
   constructor(props) {
@@ -44,11 +47,11 @@ class App extends Component {
   }
 
   getInfo(keyword, type) {
-    fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=5', {
+    fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=10', {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        // authorization: 'BearF5MKSIpHAt9ukR7tWo9vdg==',
+        authorization: 'Bearer F5MKSIpHAt9ukR7tWo9vdg==',
       },
     })
       .then(res => res.json())
@@ -81,9 +84,14 @@ class App extends Component {
     if (error) {
       result = (<div>Error: {error.message}</div>);
     } else if (!isLoaded) {
-      result = (<div>Loading...</div>);
-    } else {
       result = (
+        <div className="tc mt5">
+          <img src={search} width="75" alt="search"/>
+          <h2 className="near-black">請輸入關鍵字</h2>
+          <p className="light-silver">搜尋歌手、專輯、歌曲</p>
+        </div>);
+    } else {
+      result = items.length > 1 ? (
         <div>
           {items.map(item => (
             <a key={item.id} href={item.url} target='_blank' rel="noreferrer">
@@ -94,21 +102,46 @@ class App extends Component {
             </a>
           ))}
         </div>
+      ):(
+        <div className="tc mt5">
+          <img src={question} width="75" alt="no results"/>
+          <h2 className="near-black">無搜尋結果</h2>
+          <p className="light-silver">嘗試其他搜尋分類或調整關鍵字內容</p>
+        </div>
       )
     }
     return (
       <main>
-        <form action="javascript:void(0);">
-          <input id="input" type="text" placeholder="輸入歌手名稱" autoComplete="off" onChange={this.onInputChange}/>
-            <input type="radio" id="artist" name="type" value="artist" onChange={this.onTypeChange} checked={this.state.type === "artist"}/>
-            <label>歌手</label>
-            <input type="radio" id="album" name="type" value="album" onChange={this.onTypeChange} checked={this.state.type === "album"}/>
-            <label>專輯</label>
-            <input type="radio" id="track" name="type" value="track" onChange={this.onTypeChange} checked={this.state.type === "track"}/>
-            <label className="mr2">歌曲</label>
-          {/*<input type="submit" value="搜尋" onClick={this.getInputValue}/>*/}
-        </form>
-        {result}
+        <section id="canvas">
+        </section>
+        <section id="side" className="flex flex-column bg-white vh-100">
+          <div className="center mv4">
+            <img src={logo} width="166" alt="KKBOX"/>
+          </div>
+          <form action="javascript:void(0);" className="bb b--black-30">
+            <div className="ph4 relative">
+              <input id="input" className="db pa2 mb4 w-100" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
+              <img src={search} width="24" className="absolute" alt="search"/>
+            </div>
+            <div className="flex justify-between">
+              <div className="w-third">
+                <input type="radio" id="artist" name="type" value="artist" onChange={this.onTypeChange} checked={this.state.type === "artist"}/>
+                <label for="artist" className="w-100 tc">歌手</label>
+              </div>
+              <div className="w-third">
+                <input type="radio" id="album" name="type" value="album" onChange={this.onTypeChange} checked={this.state.type === "album"}/>
+                <label for="album" className="w-100 tc">專輯</label>
+              </div>
+              <div className="w-third">
+                <input type="radio" id="track" name="type" value="track" onChange={this.onTypeChange} checked={this.state.type === "track"}/>
+                <label for="track" className="w-100 tc">歌曲</label>
+              </div>
+            </div>
+          </form>
+          <div className="overflow-y-scroll overflow-x-hidden pl3">
+            {result}
+          </div>
+        </section>
       </main>
     )
   }
