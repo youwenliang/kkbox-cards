@@ -7,10 +7,16 @@ body {
 main {
 	display: flex;
 	background-color: #f2f2f2;
+	transition: all .2s ease-in-out;
 }
 
 #canvas {
 	flex-grow: 1;
+}
+
+#card {
+	transition: all .2s ease-in-out;
+	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
 }
 
 #side {

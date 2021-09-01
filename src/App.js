@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {Palette, usePalette} from 'react-palette';
 import './App.css';
 import logo from './images/logo.png';
 import search from './images/ic_search_24.svg';
@@ -11,6 +12,8 @@ var type = {
   'album': '專輯',
 }
 
+let cardImage = [];
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -20,24 +23,35 @@ class App extends Component {
       items: [],
       keyword: '',
       type: 'artist',
-      current: null,
-      cardType: ''
+      current: [],
+      cardType: '',
+      url:'',
+      colors: []
     };
     this.selectCard = this.selectCard.bind(this);
+    this.updateCard = this.updateCard.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
     this.getInputValue = this.getInputValue.bind(this);
     this.getInfo = this.getInfo.bind(this);
   }
 
-  componentDidMount() {
+  componentDidUpdate() {
     
   }
 
   selectCard(event, i) {
-    this.setState({current: i});
+    this.setState({current: i}, this.updateCard);
     $('.active').removeClass('active');
     event.target.classList.add('active');
+  }
+
+  updateCard() {
+    var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
+    this.setState({url: url});
+    cardImage = (<img src={url} width="300"/>);
+    // $('main').css({'background-color': data.vibrant});
+    this.forceUpdate();
   }
 
   onTypeChange(event) {
@@ -133,9 +147,14 @@ class App extends Component {
         </div>
       )
     }
+
     return (
       <main>
-        <section id="canvas">
+        <section id="canvas" className="flex justify-center items-center">
+          <div id="card" className="pa5 br3">
+            {cardImage}
+          </div>
+          <FindColor url={this.state.url}/>
         </section>
         <section id="side" className="flex flex-column bg-white vh-100">
           <div className="center mv4">
@@ -149,19 +168,19 @@ class App extends Component {
             <div className="flex justify-between">
               <div className="w-third">
                 <input type="radio" id="artist" name="type" value="artist" onChange={this.onTypeChange} checked={this.state.type === "artist"}/>
-                <label for="artist" className="w-100 tc">歌手</label>
+                <label htmlFor="artist" className="w-100 tc">歌手</label>
               </div>
               <div className="w-third">
                 <input type="radio" id="album" name="type" value="album" onChange={this.onTypeChange} checked={this.state.type === "album"}/>
-                <label for="album" className="w-100 tc">專輯</label>
+                <label htmlFor="album" className="w-100 tc">專輯</label>
               </div>
               <div className="w-third">
                 <input type="radio" id="track" name="type" value="track" onChange={this.onTypeChange} checked={this.state.type === "track"}/>
-                <label for="track" className="w-100 tc">歌曲</label>
+                <label htmlFor="track" className="w-100 tc">歌曲</label>
               </div>
             </div>
           </form>
-          <div className="overflow-y-scroll overflow-x-hidden pl3 pt2">
+          <div className="overflow-y-scroll overflow-x-hidden pl3 pv2">
             {result}
           </div>
         </section>
@@ -170,3 +189,11 @@ class App extends Component {
   }
 }
 export default App;
+
+
+function FindColor(props) {
+  const { data, loading, error } = usePalette(props.url)
+  $('main').css({'background-color': data.darkVibrant});
+  $('#card').css({'background-color': data.vibrant});
+  return true;
+}
