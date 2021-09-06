@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import {Palette, usePalette} from 'react-palette';
+import Tilty from 'react-tilty';
 import './App.css';
 import logo from './images/logo.png';
+import mono from './images/mono.png';
+import pattern from './images/pattern.png';
 import search from './images/ic_search_24.svg';
 import question from './images/ic_faq_20.svg';
 import $ from 'jquery';
@@ -37,7 +40,6 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    
   }
 
   selectCard(event, i) {
@@ -148,12 +150,38 @@ class App extends Component {
       )
     }
 
+    var patternImg = {
+      backgroundImage: 'url('+pattern+')',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundRepeat: 'no-repeat',
+      // width: '100%',
+      // height: '100%',
+      // position: 'absolute',
+      // top: 0,
+      // left: 0
+    }
+
     return (
       <main>
         <section id="canvas" className="flex justify-center items-center">
-          <div id="card" className="pa5 br3">
-            {cardImage}
-          </div>
+          <Tilty 
+            maxTilt={10}
+            perspective={1400}
+            easing="cubic-bezier(.03,.98,.52,.99)"
+            speed={1200}
+            scale={1.1}
+          >
+            <div id="card" className="pa5 br3" data-tilt style={patternImg}>
+              <img id="mono" src={mono} width="30"/>
+              <div id="mask" className="pa4 white flex items-start flex-column justify-end">
+                <h1 className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
+                <p className="mt1 mv0 f6 o-9">{type[this.state.cardType]+' / '+this.state.cardType.substring(0,1).toUpperCase()+this.state.cardType.substring(1)}</p>
+              </div>
+              {cardImage}
+              <div id="pattern" style={patternImg}></div>
+            </div>
+          </Tilty>
           <FindColor url={this.state.url}/>
         </section>
         <section id="side" className="flex flex-column bg-white vh-100">
@@ -193,7 +221,8 @@ export default App;
 
 function FindColor(props) {
   const { data, loading, error } = usePalette(props.url)
-  $('main').css({'background-color': data.darkVibrant});
-  $('#card').css({'background-color': data.vibrant});
+  $('main').css({'background-color': data.darkMuted});
+  $('#card').css({'background-color': data.darkVibrant});
+  $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, rgba(255,255,255,0) 75% 100%)'})
   return true;
 }
