@@ -16,9 +16,14 @@ main {
 
 #card {
 	transition: all .2s ease-in-out;
-	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
+	/*box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;*/
 	position: relative;
 	overflow: hidden;
+	transform-style: preserve-3d;
+}
+
+#card:hover {
+	box-shadow: 0 15px 10px rgba(0,0,0,0.5);
 }
 
 #mono {
@@ -29,6 +34,10 @@ main {
 
 .pa5 {
 	padding: 3rem;
+}
+
+img {
+	vertical-align: bottom;
 }
 
 #mask {
@@ -60,6 +69,10 @@ main {
 
 #results.hide {
 	opacity: 0;
+}
+
+.cp {
+	cursor: pointer;
 }
 
 .card .primary {
@@ -95,7 +108,7 @@ input:focus, textarea:focus, select:focus{
     outline: none;
 }
 
-input[type=text] {
+#input {
   	background-color: rgba(118,118,128,.12);
   	color: #111111;
   	border: none;
@@ -103,7 +116,53 @@ input[type=text] {
   	padding: 16px 16px 16px 44px;
 }
 
-input[type=text] + img {
+#url {
+	background-color: white;
+  	color: #111111;
+  	border: none;
+  	border-radius: 40px;
+  	padding: 8px 16px;
+  	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
+	transition: all .2s ease-in-out;
+	user-select: none;
+}
+
+#check {
+	top: 0;
+    right: 108px;
+    background: white;
+    padding: 4px;
+    border-radius: 100%;
+    transition: all .2s ease-in-out;
+    opacity: 0;
+}
+
+#check.show {
+	opacity: 1;
+}
+
+#url:hover {
+	background-color: rgba(255,255,255,.75);;
+}
+
+#save {
+	background-color: #09cef6;
+	border-radius: 40px;
+	color: white;
+	width: 120px;
+	border: none;
+	cursor: pointer;
+	outline: inherit;
+	padding: 0 16px;
+	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
+	transition: all .2s ease-in-out;
+}
+
+#save:hover {
+	background-color: #00B6E1;
+}
+
+#input + img {
 	top: calc(50% - 12px);
     left: 44px;
 }

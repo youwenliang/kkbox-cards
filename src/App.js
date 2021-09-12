@@ -6,8 +6,11 @@ import logo from './images/logo.png';
 import mono from './images/mono.png';
 import pattern from './images/pattern.png';
 import search from './images/ic_search_24.svg';
+import check from './images/ic_check_24.png';
 import question from './images/ic_faq_20.svg';
 import $ from 'jquery';
+import html2canvas from 'html2canvas';
+import ReactTooltip from 'react-tooltip';
 
 var type = {
   'artist': '歌手',
@@ -31,15 +34,38 @@ class App extends Component {
       url:'',
       colors: []
     };
+    this.saveImage = this.saveImage.bind(this);
     this.selectCard = this.selectCard.bind(this);
     this.updateCard = this.updateCard.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
     this.getInputValue = this.getInputValue.bind(this);
     this.getInfo = this.getInfo.bind(this);
+    this.copyURL = this.copyURL.bind(this);
   }
 
   componentDidUpdate() {
+  }
+
+  copyURL() {
+    var copyText = document.getElementById("url");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /* For mobile devices */
+    navigator.clipboard.writeText(copyText.value);
+    $('#check').addClass('show');
+    setTimeout(function(){
+      $('#check').removeClass('show');
+    },3000)
+  }
+
+  saveImage() {
+    html2canvas(document.querySelector('#card'), {
+      allowTaint: true,
+    }).then(function(canvas){    
+        document.body.appendChild(canvas)
+        var win = window.open();
+        win.document.write("<img src='" + document.querySelector('canvas').toDataURL()+"'/>");
+    });
   }
 
   selectCard(event, i) {
@@ -51,7 +77,7 @@ class App extends Component {
   updateCard() {
     var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
     this.setState({url: url});
-    cardImage = (<img src={url} width="300"/>);
+    cardImage = (<img crossorigin="anonymous" src={url} width="300"/>);
     // $('main').css({'background-color': data.vibrant});
     this.forceUpdate();
   }
@@ -164,13 +190,15 @@ class App extends Component {
 
     return (
       <main>
-        <section id="canvas" className="flex justify-center items-center">
+        <section id="canvas" className="flex justify-center items-center flex-column">
           <Tilty 
-            maxTilt={10}
+            maxTilt={2}
             perspective={1400}
             easing="cubic-bezier(.03,.98,.52,.99)"
             speed={1200}
             scale={1.1}
+            glare={false}
+            maxGlare={0.8}
           >
             <div id="card" className="pa5 br3" data-tilt style={patternImg}>
               <img id="mono" src={mono} width="30"/>
@@ -183,6 +211,12 @@ class App extends Component {
             </div>
           </Tilty>
           <FindColor url={this.state.url}/>
+          <div className="w-third flex flex-row mt5 f6 relative">
+            <input data-tip="Copy Link" className="w-100 cp" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
+            <img id="check" src={check} width="24" className="absolute" alt="check"/>
+            <button className="db ml3" id="save" onClick={this.saveImage}>下載圖片</button>
+          </div>
+          <ReactTooltip />
         </section>
         <section id="side" className="flex flex-column bg-white vh-100">
           <div className="center mv4">
@@ -223,6 +257,6 @@ function FindColor(props) {
   const { data, loading, error } = usePalette(props.url)
   $('main').css({'background-color': data.darkMuted});
   $('#card').css({'background-color': data.darkVibrant});
-  $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, rgba(255,255,255,0) 75% 100%)'})
+  $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
   return true;
 }
