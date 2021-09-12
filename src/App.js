@@ -30,6 +30,7 @@ class App extends Component {
       keyword: '',
       type: 'artist',
       current: [],
+      currentType: '',
       cardType: '',
       url:'',
       colors: []
@@ -59,25 +60,27 @@ class App extends Component {
   }
 
   saveImage() {
+    var $t = this;
     html2canvas(document.querySelector('#card'), {
       allowTaint: true,
+      useCORS: true
     }).then(function(canvas){    
-        document.body.appendChild(canvas)
         var win = window.open();
-        win.document.write("<img src='" + document.querySelector('canvas').toDataURL()+"'/>");
+        win.document.write("<a href='"+ canvas.toDataURL() +"' download = 'kkbox_"+$t.state.current.name+".png'><img crossOrigin='anonymous' src='" + canvas.toDataURL()+"'/>");
     });
   }
 
   selectCard(event, i) {
-    this.setState({current: i}, this.updateCard);
+    this.setState({current: i, currentType: this.state.type}, this.updateCard);
     $('.active').removeClass('active');
     event.target.classList.add('active');
+    $('#canvas').removeClass('hide');
   }
 
   updateCard() {
     var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
     this.setState({url: url});
-    cardImage = (<img crossorigin="anonymous" src={url} width="300"/>);
+    cardImage = (<img crossOrigin="anonymous" src={url} width="300"/>);
     // $('main').css({'background-color': data.vibrant});
     this.forceUpdate();
   }
@@ -86,7 +89,7 @@ class App extends Component {
     this.setState({
       type: event.target.value
     });
-    if(this.state.keyword.length > 1) this.getInputValue();
+    if(this.state.keyword.length > 1) this.getInputValue();    
   }
 
   onInputChange(event) {
@@ -124,7 +127,7 @@ class App extends Component {
                 items: result[type+'s'].data,
                 cardType: type
               });
-              console.log(result)
+              // console.log(result)
               $('#results').removeClass('hide');
             },100)
           }
@@ -190,7 +193,7 @@ class App extends Component {
 
     return (
       <main>
-        <section id="canvas" className="flex justify-center items-center flex-column">
+        <section id="canvas" className="flex justify-center items-center flex-column hide">
           <Tilty 
             maxTilt={2}
             perspective={1400}
@@ -204,17 +207,17 @@ class App extends Component {
               <img id="mono" src={mono} width="30"/>
               <div id="mask" className="pa4 white flex items-start flex-column justify-end">
                 <h1 className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
-                <p className="mt1 mv0 f6 o-9">{type[this.state.cardType]+' / '+this.state.cardType.substring(0,1).toUpperCase()+this.state.cardType.substring(1)}</p>
+                <p className="mt1 mv0 f6 o-9">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
               </div>
               {cardImage}
               <div id="pattern" style={patternImg}></div>
             </div>
           </Tilty>
           <FindColor url={this.state.url}/>
-          <div className="w-third flex flex-row mt5 f6 relative">
-            <input data-tip="Copy Link" className="w-100 cp" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
+          <div className="w-third flex flex-row mt5 f6 relative h2">
+            <input data-tip="複製連結" className="w-100 cp" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
             <img id="check" src={check} width="24" className="absolute" alt="check"/>
-            <button className="db ml3" id="save" onClick={this.saveImage}>下載圖片</button>
+            <button className="db ml3 flex items-center justify-center flex-shrink-0" id="save" onClick={this.saveImage}>下載圖片</button>
           </div>
           <ReactTooltip />
         </section>
@@ -245,6 +248,7 @@ class App extends Component {
           <div className="overflow-y-scroll overflow-x-hidden pl3 pv2">
             {result}
           </div>
+          <div id="tab"></div>
         </section>
       </main>
     )
@@ -254,6 +258,14 @@ export default App;
 
 
 function FindColor(props) {
+  const { data, loading, error } = usePalette(props.url)
+  $('main').css({'background-color': data.darkMuted});
+  $('#card').css({'background-color': data.darkVibrant});
+  $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
+  return true;
+}
+
+function ChangeColor(props) {
   const { data, loading, error } = usePalette(props.url)
   $('main').css({'background-color': data.darkMuted});
   $('#card').css({'background-color': data.darkVibrant});

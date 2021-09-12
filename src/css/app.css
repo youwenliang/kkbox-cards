@@ -12,6 +12,11 @@ main {
 
 #canvas {
 	flex-grow: 1;
+	transition: all .4s ease-in-out;
+}
+
+#canvas.hide {
+	opacity: 0;
 }
 
 #card {
@@ -129,7 +134,7 @@ input:focus, textarea:focus, select:focus{
 
 #check {
 	top: 0;
-    right: 108px;
+    right: 116px;
     background: white;
     padding: 4px;
     border-radius: 100%;
@@ -149,7 +154,7 @@ input:focus, textarea:focus, select:focus{
 	background-color: #09cef6;
 	border-radius: 40px;
 	color: white;
-	width: 120px;
+	width: 100px;
 	border: none;
 	cursor: pointer;
 	outline: inherit;
