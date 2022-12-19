@@ -26,6 +26,7 @@ class App extends Component {
     this.state = {
       error: null,
       isLoaded: false,
+      selected: false,
       items: [],
       keyword: '',
       type: 'artist',
@@ -71,7 +72,7 @@ class App extends Component {
   }
 
   selectCard(event, i) {
-    this.setState({current: i, currentType: this.state.type}, this.updateCard);
+    this.setState({current: i, currentType: this.state.type, selected: true}, this.updateCard);
     $('.active').removeClass('active');
     event.target.classList.add('active');
     $('#canvas').removeClass('hide');
@@ -113,7 +114,7 @@ class App extends Component {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        authorization: 'Bearer F5MKSIpHAt9ukR7tWo9vdg==',
+        authorization: 'Bearer Ep86pr_Jl8ofhoZxChaXhQ==',
       },
     })
       .then(res => res.json())
@@ -127,7 +128,7 @@ class App extends Component {
                 items: result[type+'s'].data,
                 cardType: type
               });
-              // console.log(result)
+              console.log(result)
               $('#results').removeClass('hide');
             },100)
           }
@@ -191,9 +192,16 @@ class App extends Component {
       // left: 0
     }
 
+    let addName = null;
+    if(this.state.selected) {
+      if(this.state.currentType === 'track') addName = (<p className="mt2 mb0 f5 o-90">{this.state.current.album.artist.name}</p>)
+      else if(this.state.currentType === 'album') addName = (<p className="mt2 mb0 f5 o-90">{this.state.current.artist.name}</p>)
+    }
+
     return (
       <main>
         <section id="canvas" className="flex justify-center items-center flex-column hide">
+          <div id="maskBG" className="o-20 w-100 h-100 absolute"></div>
           <Tilty 
             maxTilt={2}
             perspective={1400}
@@ -207,7 +215,8 @@ class App extends Component {
               <img id="mono" src={mono} width="30"/>
               <div id="mask" className="pa4 white flex items-start flex-column justify-end">
                 <h1 className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
-                <p className="mt1 mv0 f6 o-9">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+                <p className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+                {addName}
               </div>
               {cardImage}
               <div id="pattern" style={patternImg}></div>
@@ -221,7 +230,7 @@ class App extends Component {
           </div>
           <ReactTooltip />
         </section>
-        <section id="side" className="flex flex-column bg-white vh-100">
+        <section id="side" className="flex flex-column bg-white vh-100 z-1">
           <div className="center mv4">
             <img src={logo} width="166" alt="KKBOX"/>
           </div>
@@ -258,8 +267,14 @@ export default App;
 
 
 function FindColor(props) {
-  const { data, loading, error } = usePalette(props.url)
+  const { data, loading, error } = usePalette(props.url);
   $('main').css({'background-color': data.darkMuted});
+  $('#maskBG').css({
+    'backgroundImage': 'url(' + props.url + ')',
+    'backgroundSize': 'cover',
+    'backgroundPosition': 'center center',
+    'filter': 'blur(1.5rem)'
+  })
   $('#card').css({'background-color': data.darkVibrant});
   $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
   return true;
