@@ -34,13 +34,19 @@ class App extends Component {
       currentType: '',
       cardType: '',
       url:'',
-      colors: []
+      colors: [],
+      text1: '',
+      text2: '',
+      style: 'style0'
     };
+    this.nextPage = this.nextPage.bind(this);
+    this.onTyping = this.onTyping.bind(this);
     this.saveImage = this.saveImage.bind(this);
     this.selectCard = this.selectCard.bind(this);
     this.updateCard = this.updateCard.bind(this);
     this.onInputChange = this.onInputChange.bind(this);
     this.onTypeChange = this.onTypeChange.bind(this);
+    this.onStyleChange = this.onStyleChange.bind(this);
     this.getInputValue = this.getInputValue.bind(this);
     this.getInfo = this.getInfo.bind(this);
     this.copyURL = this.copyURL.bind(this);
@@ -58,6 +64,10 @@ class App extends Component {
     setTimeout(function(){
       $('#check').removeClass('show');
     },3000)
+  }
+
+  nextPage() {
+    $('#home').css({'opacity': 0, 'pointer-events':'none'});
   }
 
   saveImage() {
@@ -81,7 +91,7 @@ class App extends Component {
   updateCard() {
     var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
     this.setState({url: url});
-    cardImage = (<img crossOrigin="anonymous" src={url} width="300"/>);
+    cardImage = (<img crossOrigin="anonymous" src={url} width="300" alt="cover"/>);
     // $('main').css({'background-color': data.vibrant});
     this.forceUpdate();
   }
@@ -91,6 +101,31 @@ class App extends Component {
       type: event.target.value
     });
     if(this.state.keyword.length > 1) this.getInputValue();    
+  }
+  onStyleChange(event) {
+    this.setState({
+      style: event.target.value
+    }, () => {
+      console.log(this.state.style);
+    });
+  }
+
+  onTyping(key, event) {
+    var $t = this;
+    if(key === 0) {
+      $t.setState({
+        text1: event.target.value
+      }, () => {
+          $('#text1').html($t.state.text1);
+      });
+      
+    } else {
+      $t.setState({
+        text2: event.target.value
+      }, () => {
+          $('#text2').html($t.state.text2);
+      });
+    }
   }
 
   onInputChange(event) {
@@ -155,7 +190,7 @@ class App extends Component {
       result = (
         <div className="tc mt5">
           <img src={search} width="75" alt="search"/>
-          <h2 className="near-black">請輸入關鍵字</h2>
+          <h2 className="near-white">請輸入關鍵字</h2>
           <p className="light-silver">搜尋歌手、專輯、歌曲</p>
         </div>);
     } else {
@@ -174,7 +209,7 @@ class App extends Component {
       ):(
         <div className="tc mt5">
           <img src={question} width="75" alt="no results"/>
-          <h2 className="near-black">無搜尋結果</h2>
+          <h2 className="near-white">無搜尋結果</h2>
           <p className="light-silver">嘗試其他搜尋分類或調整關鍵字內容</p>
         </div>
       )
@@ -198,45 +233,128 @@ class App extends Component {
       else if(this.state.currentType === 'album') addName = (<p className="mt2 mb0 f5 o-90">{this.state.current.artist.name}</p>)
     }
 
+    // 三種卡片風格
+    var card = {
+      "style0" : (
+      <Tilty 
+        maxTilt={2}
+        perspective={1400}
+        easing="cubic-bezier(.03,.98,.52,.99)"
+        speed={1200}
+        scale={1.05}
+        glare={false}
+        maxGlare={0.8}
+      >
+        <div id="card" className="pa5 br3" data-tilt style={patternImg}>
+          <img id="mono" src={mono} width="30" alt="KKBOX" />
+          <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
+            <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
+            <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+            {addName}
+          </div>
+          {cardImage}
+          <div id="pattern" style={patternImg}></div>
+        </div>
+      </Tilty>
+      ),
+      "style1" : (
+      <Tilty 
+        maxTilt={2}
+        perspective={1400}
+        easing="cubic-bezier(.03,.98,.52,.99)"
+        speed={1200}
+        scale={1.05}
+        glare={true}
+        maxGlare={0.8}
+      >
+        <div id="card" className="pa5 br3" data-tilt style={patternImg}>
+          <img id="mono" src={mono} width="30" alt="KKBOX" />
+          <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
+            <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
+            <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+            {addName}
+          </div>
+          {cardImage}
+          <div id="pattern" style={patternImg}></div>
+        </div>
+      </Tilty>
+      ),
+      "style2" : (
+      <Tilty 
+        maxTilt={2}
+        perspective={1400}
+        easing="cubic-bezier(.03,.98,.52,.99)"
+        speed={1200}
+        scale={1.05}
+        glare={false}
+        maxGlare={0.8}
+      >
+        <div id="card" className="pa5 br3" data-tilt style={patternImg}>
+          <img id="mono" src={mono} width="30" alt="KKBOX" />
+          <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
+            <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
+            <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+            {addName}
+          </div>
+          {cardImage}
+          <div id="pattern" style={patternImg}></div>
+        </div>
+      </Tilty>
+      )
+    }
+
     return (
       <main>
+        <div id="home" className="absolute top0 left0 vh-100 w-100 flex bg-dark-gray flex-column justify-center items-center z-2">
+          <h1>最偉大的作品</h1>
+          <button onClick={this.nextPage}>開始製作</button>
+        </div>
         <section id="canvas" className="flex justify-center items-center flex-column hide">
           <div id="maskBG" className="o-20 w-100 h-100 absolute"></div>
-          <Tilty 
-            maxTilt={2}
-            perspective={1400}
-            easing="cubic-bezier(.03,.98,.52,.99)"
-            speed={1200}
-            scale={1.1}
-            glare={false}
-            maxGlare={0.8}
-          >
-            <div id="card" className="pa5 br3" data-tilt style={patternImg}>
-              <img id="mono" src={mono} width="30"/>
-              <div id="mask" className="pa4 white flex items-start flex-column justify-end">
-                <h1 className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
-                <p className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
-                {addName}
-              </div>
-              {cardImage}
-              <div id="pattern" style={patternImg}></div>
-            </div>
-          </Tilty>
+          <div className="w-100 mb5 z-1">
+            <form className="flex flex-row justify-center">
+              <label className="labl">
+                <input id="style0" type="radio" name="style" value="style0" onChange={this.onStyleChange} checked={this.state.style === "style0"}/>
+                <div htmlfor="style0" className="cp circle br3 bg-near-white"></div>
+              </label>
+              <label className="labl">
+                <input id="style1" type="radio" name="style" value="style1" onChange={this.onStyleChange} checked={this.state.style === "style1"}/>
+                <div htmlfor="style1" className="cp circle br3 bg-near-white"></div>
+              </label>
+              <label className="labl">
+                <input id="style2" type="radio" name="style" value="style2" onChange={this.onStyleChange} checked={this.state.style === "style2"}/>
+                <div htmlfor="style2" className="cp circle br3 bg-near-white"></div>
+              </label>
+            </form>
+          </div>
+          {card[this.state.style]}
           <FindColor url={this.state.url}/>
-          <div className="w-third flex flex-row mt5 f6 relative h2">
-            <input data-tip="複製連結" className="w-100 cp" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
+          <div className="mt5 mw-400 z-1">
+            <form>
+              <div className="mv3 flex items-center flex-row">
+                <label className="near-white pr3">標題</label>
+                <input type="text" className="textbox flex-grow-1" placeholder="輸入標題" onChange={(e) => this.onTyping(0, e)}/>
+              </div>
+              <div className="mv3 flex items-center flex-row">
+                <label className="near-white pr3 mv2">內文</label>
+                <input type="text" className="textbox flex-grow-1" placeholder="輸入內文" onChange={(e) => this.onTyping(1, e)}/>
+              </div>
+            </form>
+          </div>
+          <div className="w-third flex flex-row mt5 f6 relative h48 z-1">
+            <input data-tip="複製連結" className="w-100 cp textbox" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
             <img id="check" src={check} width="24" className="absolute" alt="check"/>
-            <button className="db ml3 flex items-center justify-center flex-shrink-0" id="save" onClick={this.saveImage}>下載圖片</button>
+            <button className="db ml3 flex items-center justify-center fw5 flex-shrink-0 black" id="save" onClick={this.saveImage}>下載圖片</button>
           </div>
           <ReactTooltip />
         </section>
-        <section id="side" className="flex flex-column bg-white vh-100 z-1">
+        <section id="side" className="flex flex-column bg-dark-gray vh-100 z-1">
           <div className="center mv4">
             <img src={logo} width="166" alt="KKBOX"/>
           </div>
-          <form action="javascript:void(0);" className="bb b--black-30">
+          <form action="javascript:void(0);" className="bb b--white-40">
             <div className="ph4 relative">
-              <input id="input" className="db pa2 mb4 w-100" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
+              <input id="input" className="db pa2 mb4 w-100 near-white" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
               <img src={search} width="24" className="absolute" alt="search"/>
             </div>
             <div className="flex justify-between">
@@ -267,13 +385,15 @@ export default App;
 
 
 function FindColor(props) {
+  // eslint-disable-next-line  no-unused-vars 
   const { data, loading, error } = usePalette(props.url);
   $('main').css({'background-color': data.darkMuted});
   $('#maskBG').css({
     'backgroundImage': 'url(' + props.url + ')',
     'backgroundSize': 'cover',
     'backgroundPosition': 'center center',
-    'filter': 'blur(1.5rem)'
+    'filter': 'blur(1.5rem)',
+    'pointerEvents': 'none'
   })
   $('#card').css({'background-color': data.darkVibrant});
   $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
@@ -281,7 +401,8 @@ function FindColor(props) {
 }
 
 function ChangeColor(props) {
-  const { data, loading, error } = usePalette(props.url)
+  // eslint-disable-next-line  no-unused-vars 
+  const { data, loading, error } = usePalette(props.url);
   $('main').css({'background-color': data.darkMuted});
   $('#card').css({'background-color': data.darkVibrant});
   $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
