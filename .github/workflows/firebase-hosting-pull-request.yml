@@ -13,5 +13,5 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KKBOX_CARDS }}'
-          projectId: kkbox-cards
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KKCARDS }}'
+          projectId: kkcards

@@ -1,13 +1,29 @@
 @import "tachyons";
 
+html,
+body {
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
 body {
 	font-family: 'PingFang TC', sans-serif;
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 main {
 	display: flex;
 	background-color: #111111;
 	transition: all .2s ease-in-out;
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+#root, #canvas {
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 .overflow-y-scroll::-webkit-scrollbar {
@@ -17,6 +33,7 @@ main {
 #canvas {
 	flex-grow: 1;
 	transition: all .4s ease-in-out;
+	height:  100vh;
 }
 
 #canvas.hide {
@@ -36,6 +53,9 @@ main {
 	box-shadow: 0 0 20px rgba(0,0,0,0.25);
 }
 
+.__react_component_tooltip {
+	border-radius: 40px !important;
+}
 
 #mono {
 	position: absolute;
@@ -52,8 +72,8 @@ img {
 }
 
 #mask {
-	width: 300px;
-	height: 300px;
+	width: 100%;
+	height: 100%;
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -65,6 +85,7 @@ img {
 #side {
 	width: 360px;
 	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
+	transition: all .6s ease-in-out;
 }
 
 .card {
@@ -133,10 +154,10 @@ input:focus, textarea:focus, select:focus{
 }
 
 .circle {
-	width: 48px;
-	height: 48px;
-	margin: 0 16px;
-	border-radius: 48px;
+	width: 40px;
+	height: 40px;
+	margin: 0 12px;
+	border-radius: 40px;
 }
 
 .textbox {
@@ -150,7 +171,12 @@ input:focus, textarea:focus, select:focus{
 	transition: all .2s ease-in-out;
 }
 
-#url {
+#home {
+	transition: all .4s ease-in-out;	
+}
+
+#url,
+#card * {
 	user-select: none;
 }
 
@@ -158,7 +184,7 @@ input:focus, textarea:focus, select:focus{
 	top: 0;
     right: 136px;
     background: #f4f4f4;
-    padding: 12px;
+    padding: 8px;
     border-radius: 100%;
     transition: all .2s ease-in-out;
     opacity: 0;
@@ -172,11 +198,11 @@ input:focus, textarea:focus, select:focus{
 	background-color: rgba(255,255,255,.75);;
 }
 
-.h48 {
-	height: 48px;
+.h40 {
+	height: 40px;
 }
 
-#save {
+.primaryBtn {
 	background-color: #09cef6;
 	border-radius: 40px;
 	color: #111111;
@@ -189,7 +215,7 @@ input:focus, textarea:focus, select:focus{
 	transition: all .2s ease-in-out;
 }
 
-#save:hover {
+.primaryBtn:hover {
 	background-color: #00B6E1;
 }
 
@@ -230,10 +256,62 @@ input[type='radio']:checked + label {
 }
 
 .labl > input + div{ /* (RADIO CHECKED) DIV STYLES */
-    background-color: #09cef6;
+    border: 2px solid #f4f4f4;
+    transition: all .2s ease-in-out;
 }
 
 .labl > input:checked + div{ /* (RADIO CHECKED) DIV STYLES */
-    border: 4px solid #f4f4f4;
-    transition: all .2s ease-in-out;
+    border: 4px solid #09cef6;
 }
+
+#searchBtn {
+	display: none;
+	z-index: 100;
+    width: 48px;
+    height: 48px;
+    background: #333;
+    border-radius: 100px 0 0 100px;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto 0;
+    transition: all .6s ease-in-out;
+    box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
+}
+
+	#side.reset {
+		margin-right: -360px;
+	} 
+
+@media only screen and (max-width: 959px) {
+  	#side {
+		width: 100vw;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	#side.hide {
+		left: 100vw;
+	} 
+
+	.controls label {
+		display: none;
+	}
+
+	#searchBtn {
+		display: flex;
+		right: 0;
+	}
+
+	#searchBtn.hide {
+		display: flex;
+		right: 100vw;
+	}
+
+	.__react_component_tooltip {
+		display: none !important;
+	}
+}
+

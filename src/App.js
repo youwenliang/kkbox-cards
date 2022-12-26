@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+// eslint-disable-next-line  no-unused-vars 
 import {Palette, usePalette} from 'react-palette';
 import Tilty from 'react-tilty';
 import './App.css';
@@ -39,20 +40,37 @@ class App extends Component {
       text2: '',
       style: 'style0'
     };
+
     this.nextPage = this.nextPage.bind(this);
-    this.onTyping = this.onTyping.bind(this);
-    this.saveImage = this.saveImage.bind(this);
-    this.selectCard = this.selectCard.bind(this);
-    this.updateCard = this.updateCard.bind(this);
-    this.onInputChange = this.onInputChange.bind(this);
+    this.showSearch = this.showSearch.bind(this);
+    
     this.onTypeChange = this.onTypeChange.bind(this);
     this.onStyleChange = this.onStyleChange.bind(this);
+    this.onTyping = this.onTyping.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
     this.getInputValue = this.getInputValue.bind(this);
     this.getInfo = this.getInfo.bind(this);
+
     this.copyURL = this.copyURL.bind(this);
+    this.saveImage = this.saveImage.bind(this);
+
+    this.selectCard = this.selectCard.bind(this);
+    this.updateCard = this.updateCard.bind(this);
   }
 
   componentDidUpdate() {
+  }
+
+  // Custom Functions
+
+  nextPage() {
+    $('#home').css({'opacity': 0, 'pointer-events':'none'});
+    $('#side').removeClass('reset');
+  }
+
+  showSearch() {
+    $('#canvas, #searchBtn').addClass('hide');
+    $('#side').removeClass('hide');
   }
 
   copyURL() {
@@ -66,18 +84,14 @@ class App extends Component {
     },3000)
   }
 
-  nextPage() {
-    $('#home').css({'opacity': 0, 'pointer-events':'none'});
-  }
-
   saveImage() {
-    var $t = this;
+    var win = window.open();
     html2canvas(document.querySelector('#card'), {
+      backgroundColor: "rgba(0,0,0,0)",
       allowTaint: true,
       useCORS: true
     }).then(function(canvas){    
-        var win = window.open();
-        win.document.write("<a href='"+ canvas.toDataURL() +"' download = 'kkbox_"+$t.state.current.name+".png'><img crossOrigin='anonymous' src='" + canvas.toDataURL()+"'/>");
+        win.document.write("<img width='100%' style='max-width:400px' crossOrigin='anonymous' src='" + canvas.toDataURL()+"'/>");
     });
   }
 
@@ -85,13 +99,14 @@ class App extends Component {
     this.setState({current: i, currentType: this.state.type, selected: true}, this.updateCard);
     $('.active').removeClass('active');
     event.target.classList.add('active');
-    $('#canvas').removeClass('hide');
+    $('#canvas, #searchBtn').removeClass('hide');
+    $('#side').addClass('hide');
   }
 
   updateCard() {
     var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
     this.setState({url: url});
-    cardImage = (<img crossOrigin="anonymous" src={url} width="300" alt="cover"/>);
+    cardImage = (<img crossOrigin="anonymous" src={url} width="100%" className="mw-400" alt="cover"/>);
     // $('main').css({'background-color': data.vibrant});
     this.forceUpdate();
   }
@@ -102,6 +117,7 @@ class App extends Component {
     });
     if(this.state.keyword.length > 1) this.getInputValue();    
   }
+
   onStyleChange(event) {
     this.setState({
       style: event.target.value
@@ -305,54 +321,58 @@ class App extends Component {
 
     return (
       <main>
-        <div id="home" className="absolute top0 left0 vh-100 w-100 flex bg-dark-gray flex-column justify-center items-center z-2">
-          <h1>最偉大的作品</h1>
-          <button onClick={this.nextPage}>開始製作</button>
+        <div id="home" className="absolute top0 left0 vh-100 w-100 flex bg-near-black flex-column justify-center items-center z-2">
+          <h1 className="near-white">最偉大的作品</h1>
+          <button className="db flex items-center justify-center fw5 h40 flex-shrink-0 black primaryBtn" onClick={this.nextPage}>開始製作</button>
         </div>
-        <section id="canvas" className="flex justify-center items-center flex-column hide">
+        <section id="canvas" className="flex justify-center items-center flex-column ph3 hide">
           <div id="maskBG" className="o-20 w-100 h-100 absolute"></div>
-          <div className="w-100 mb5 z-1">
-            <form className="flex flex-row justify-center">
+          <div className="w-100 mb5-l mb3 z-1">
+            <form className="flex flex-row justify-center mb3">
               <label className="labl">
                 <input id="style0" type="radio" name="style" value="style0" onChange={this.onStyleChange} checked={this.state.style === "style0"}/>
-                <div htmlfor="style0" className="cp circle br3 bg-near-white"></div>
+                <div data-tip="風格一" htmlfor="style0" id="c1" className="cp circle br3 bg-near-white"></div>
               </label>
               <label className="labl">
                 <input id="style1" type="radio" name="style" value="style1" onChange={this.onStyleChange} checked={this.state.style === "style1"}/>
-                <div htmlfor="style1" className="cp circle br3 bg-near-white"></div>
+                <div data-tip="風格二" htmlfor="style1" id="c2" className="cp circle br3 bg-near-white"></div>
               </label>
               <label className="labl">
                 <input id="style2" type="radio" name="style" value="style2" onChange={this.onStyleChange} checked={this.state.style === "style2"}/>
-                <div htmlfor="style2" className="cp circle br3 bg-near-white"></div>
+                <div data-tip="風格三" htmlfor="style2" id="c3" className="cp circle br3 bg-near-white"></div>
               </label>
             </form>
           </div>
           {card[this.state.style]}
           <FindColor url={this.state.url}/>
-          <div className="mt5 mw-400 z-1">
+          <div className="controls mt5-l mt3 mw-400 z-1 f6">
             <form>
               <div className="mv3 flex items-center flex-row">
                 <label className="near-white pr3">標題</label>
-                <input type="text" className="textbox flex-grow-1" placeholder="輸入標題" onChange={(e) => this.onTyping(0, e)}/>
+                <input type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入標題" onChange={(e) => this.onTyping(0, e)}/>
               </div>
               <div className="mv3 flex items-center flex-row">
                 <label className="near-white pr3 mv2">內文</label>
-                <input type="text" className="textbox flex-grow-1" placeholder="輸入內文" onChange={(e) => this.onTyping(1, e)}/>
+                <input type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入內文" onChange={(e) => this.onTyping(1, e)}/>
               </div>
             </form>
           </div>
-          <div className="w-third flex flex-row mt5 f6 relative h48 z-1">
-            <input data-tip="複製連結" className="w-100 cp textbox" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
+          <div className="controls w-100 mw-400 flex flex-row items-center relative z-1 f6">
+            <label className="near-white pr3 mv2 flex-shrink-0">分享</label>
+            <input data-tip={"複製"+type[this.state.cardType]+"連結"} className="flex-grow-1 cp textbox h40 o-80" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
             <img id="check" src={check} width="24" className="absolute" alt="check"/>
-            <button className="db ml3 flex items-center justify-center fw5 flex-shrink-0 black" id="save" onClick={this.saveImage}>下載圖片</button>
+            <button className="db ml3 flex items-center justify-center fw5 h40 flex-shrink-0 black primaryBtn" id="save" onClick={this.saveImage}>下載圖片</button>
           </div>
           <ReactTooltip />
         </section>
-        <section id="side" className="flex flex-column bg-dark-gray vh-100 z-1">
+        <div id="searchBtn" className="absolute hide" onClick={this.showSearch}>
+          <img src={search} width="32" alt="search"/>
+        </div>
+        <section id="side" className="flex flex-column bg-dark-gray vh-100 z-1 reset">
           <div className="center mv4">
             <img src={logo} width="166" alt="KKBOX"/>
           </div>
-          <form action="javascript:void(0);" className="bb b--white-40">
+          <form action='javascript:void(0);' className="bb b--white-40">
             <div className="ph4 relative">
               <input id="input" className="db pa2 mb4 w-100 near-white" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
               <img src={search} width="24" className="absolute" alt="search"/>
@@ -396,15 +416,9 @@ function FindColor(props) {
     'pointerEvents': 'none'
   })
   $('#card').css({'background-color': data.darkVibrant});
-  $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
-  return true;
-}
-
-function ChangeColor(props) {
-  // eslint-disable-next-line  no-unused-vars 
-  const { data, loading, error } = usePalette(props.url);
-  $('main').css({'background-color': data.darkMuted});
-  $('#card').css({'background-color': data.darkVibrant});
+  $('#c1').css({'background-color': data.lightMuted});
+  $('#c2').css({'background-color': data.muted});
+  $('#c3').css({'background-color': data.darkMuted});
   $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
   return true;
 }
