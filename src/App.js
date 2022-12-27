@@ -8,10 +8,11 @@ import mono from './images/mono.png';
 import pattern from './images/pattern.png';
 import search from './images/ic_search_24.svg';
 import check from './images/ic_check_24.png';
-import question from './images/ic_faq_20.svg';
 import $ from 'jquery';
 import html2canvas from 'html2canvas';
 import ReactTooltip from 'react-tooltip';
+import searchStatus from './images/search.png';
+import emptyStatus from './images/empty.png';
 
 var type = {
   'artist': '歌手',
@@ -19,7 +20,7 @@ var type = {
   'album': '專輯',
 }
 
-let cardImage = [];
+let cardImage = (<img crossOrigin="anonymous" src="https://placehold.co/600" width="100%" className="mw-400" alt="cover"/>);
 
 class App extends Component {
   constructor(props) {
@@ -106,7 +107,7 @@ class App extends Component {
   updateCard() {
     var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
     this.setState({url: url});
-    cardImage = (<img crossOrigin="anonymous" src={url} width="100%" className="mw-400" alt="cover"/>);
+    cardImage = (<img crossOrigin="anonymous" src={url} width="100%" className="mw-300" alt="cover"/>);
     // $('main').css({'background-color': data.vibrant});
     this.forceUpdate();
   }
@@ -161,7 +162,7 @@ class App extends Component {
 
   getInfo(keyword, type) {
     $('#results').addClass('hide');
-    fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=10', {
+    fetch('https://api.kkbox.com/v1.1/search?q='+keyword+'&type='+type+'&territory=TW&offset=0&limit=20', {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -205,9 +206,9 @@ class App extends Component {
     } else if (!isLoaded) {
       result = (
         <div className="tc mt5">
-          <img src={search} width="75" alt="search"/>
-          <h2 className="near-white">請輸入關鍵字</h2>
-          <p className="light-silver">搜尋歌手、專輯、歌曲</p>
+          <img src={searchStatus} width="200" alt="search"/>
+          <h2 className="near-white mt0">請輸入關鍵字</h2>
+          <p className="light-silver">搜尋歌手、專輯或歌曲</p>
         </div>);
     } else {
       result = items.length > 1 ? (
@@ -224,9 +225,9 @@ class App extends Component {
         </div>
       ):(
         <div className="tc mt5">
-          <img src={question} width="75" alt="no results"/>
-          <h2 className="near-white">無搜尋結果</h2>
-          <p className="light-silver">嘗試其他搜尋分類或調整關鍵字內容</p>
+          <img src={emptyStatus} width="200" alt="no results"/>
+          <h2 className="near-white mt0">無搜尋結果</h2>
+          <p className="light-silver">嘗試搜尋其他分類，或調整關鍵字內容</p>
         </div>
       )
     }
@@ -262,7 +263,7 @@ class App extends Component {
         maxGlare={0.8}
       >
         <div id="card" className="pa5 br3" data-tilt style={patternImg}>
-          <img id="mono" src={mono} width="30" alt="KKBOX" />
+          <img id="mono" className="z-1" src={mono} width="30" alt="KKBOX" />
           <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
             <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
             <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
@@ -327,67 +328,67 @@ class App extends Component {
         </div>
         <section id="canvas" className="flex justify-center items-center flex-column ph3 hide">
           <div id="maskBG" className="o-20 w-100 h-100 absolute"></div>
-          <div className="w-100 mb5-l mb3 z-1">
+          <div className="w-100 mb4-l mb3 z-1">
             <form className="flex flex-row justify-center mb3">
               <label className="labl">
-                <input id="style0" type="radio" name="style" value="style0" onChange={this.onStyleChange} checked={this.state.style === "style0"}/>
+                <input id="style0" aria-label="style0" type="radio" name="style" value="style0" onChange={this.onStyleChange} checked={this.state.style === "style0"}/>
                 <div data-tip="風格一" htmlfor="style0" id="c1" className="cp circle br3 bg-near-white"></div>
               </label>
               <label className="labl">
-                <input id="style1" type="radio" name="style" value="style1" onChange={this.onStyleChange} checked={this.state.style === "style1"}/>
+                <input id="style1" aria-label="style1" type="radio" name="style" value="style1" onChange={this.onStyleChange} checked={this.state.style === "style1"}/>
                 <div data-tip="風格二" htmlfor="style1" id="c2" className="cp circle br3 bg-near-white"></div>
               </label>
               <label className="labl">
-                <input id="style2" type="radio" name="style" value="style2" onChange={this.onStyleChange} checked={this.state.style === "style2"}/>
+                <input id="style2" aria-label="style2" type="radio" name="style" value="style2" onChange={this.onStyleChange} checked={this.state.style === "style2"}/>
                 <div data-tip="風格三" htmlfor="style2" id="c3" className="cp circle br3 bg-near-white"></div>
               </label>
             </form>
           </div>
           {card[this.state.style]}
           <FindColor url={this.state.url}/>
-          <div className="controls mt5-l mt3 mw-400 z-1 f6">
+          <div className="controls mt4-l mt3 mw-400 z-1 f6">
             <form>
               <div className="mv3 flex items-center flex-row">
                 <label className="near-white pr3">標題</label>
-                <input type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入標題" onChange={(e) => this.onTyping(0, e)}/>
+                <input aria-label="title" type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入標題" onChange={(e) => this.onTyping(0, e)}/>
               </div>
               <div className="mv3 flex items-center flex-row">
                 <label className="near-white pr3 mv2">內文</label>
-                <input type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入內文" onChange={(e) => this.onTyping(1, e)}/>
+                <input aria-label="content" type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入內文" onChange={(e) => this.onTyping(1, e)}/>
               </div>
             </form>
           </div>
           <div className="controls w-100 mw-400 flex flex-row items-center relative z-1 f6">
             <label className="near-white pr3 mv2 flex-shrink-0">分享</label>
-            <input data-tip={"複製"+type[this.state.cardType]+"連結"} className="flex-grow-1 cp textbox h40 o-80" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
+            <input aria-label="url" data-tip={"複製"+type[this.state.cardType]+"連結"} className="flex-grow-1 cp textbox h40 o-80" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
             <img id="check" src={check} width="24" className="absolute" alt="check"/>
-            <button className="db ml3 flex items-center justify-center fw5 h40 flex-shrink-0 black primaryBtn" id="save" onClick={this.saveImage}>下載圖片</button>
+            <button className="db ml3 flex items-center justify-center fw5 h40 flex-shrink-0 black secondaryBtn" id="save" onClick={this.saveImage}>下載圖片</button>
           </div>
           <ReactTooltip />
         </section>
-        <div id="searchBtn" className="absolute hide" onClick={this.showSearch}>
+        <div id="searchBtn" className="absolute hide cp" onClick={this.showSearch}>
           <img src={search} width="32" alt="search"/>
         </div>
         <section id="side" className="flex flex-column bg-dark-gray vh-100 z-1 reset">
           <div className="center mv4">
-            <img src={logo} width="166" alt="KKBOX"/>
+            <a href="."><img src={logo} width="120" alt="KKCards"/></a>
           </div>
           <form action='javascript:void(0);' className="bb b--white-40">
             <div className="ph4 relative">
-              <input id="input" className="db pa2 mb4 w-100 near-white" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
+              <input aria-label="search" id="input" className="db pa2 mb4 w-100 near-white" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
               <img src={search} width="24" className="absolute" alt="search"/>
             </div>
             <div className="flex justify-between">
               <div className="w-third">
-                <input type="radio" id="artist" name="type" value="artist" onChange={this.onTypeChange} checked={this.state.type === "artist"}/>
+                <input aria-label="artist" type="radio" id="artist" name="type" value="artist" onChange={this.onTypeChange} checked={this.state.type === "artist"}/>
                 <label htmlFor="artist" className="w-100 tc">歌手</label>
               </div>
               <div className="w-third">
-                <input type="radio" id="album" name="type" value="album" onChange={this.onTypeChange} checked={this.state.type === "album"}/>
+                <input aria-label="album" type="radio" id="album" name="type" value="album" onChange={this.onTypeChange} checked={this.state.type === "album"}/>
                 <label htmlFor="album" className="w-100 tc">專輯</label>
               </div>
               <div className="w-third">
-                <input type="radio" id="track" name="type" value="track" onChange={this.onTypeChange} checked={this.state.type === "track"}/>
+                <input aria-label="track" type="radio" id="track" name="type" value="track" onChange={this.onTypeChange} checked={this.state.type === "track"}/>
                 <label htmlFor="track" className="w-100 tc">歌曲</label>
               </div>
             </div>
