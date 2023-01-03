@@ -4,8 +4,10 @@ import {Palette, usePalette} from 'react-palette';
 import Tilty from 'react-tilty';
 import './App.css';
 import logo from './images/logo.png';
-import mono from './images/mono.png';
-import pattern from './images/pattern.png';
+import mono from './images/listen.png';
+import pattern1 from './images/pattern1.png';
+import pattern2 from './images/pattern2.png';
+import pattern3 from './images/pattern3.png';
 import search from './images/ic_search_24.svg';
 import check from './images/ic_check_24.png';
 import $ from 'jquery';
@@ -20,7 +22,9 @@ var type = {
   'album': '專輯',
 }
 
-let cardImage = (<img crossOrigin="anonymous" src="https://placehold.co/600" width="100%" className="mw-400" alt="cover"/>);
+var colors = [];
+
+let cardImage = (<img crossOrigin="anonymous" src="https://placehold.co/600" width="100%" className="mw-300" alt="cover"/>);
 
 class App extends Component {
   constructor(props) {
@@ -39,7 +43,10 @@ class App extends Component {
       colors: [],
       text1: '',
       text2: '',
-      style: 'style0'
+      text3: '',
+      style: 'style0',
+      first: true,
+      easter: false
     };
 
     this.nextPage = this.nextPage.bind(this);
@@ -91,23 +98,33 @@ class App extends Component {
       backgroundColor: "rgba(0,0,0,0)",
       allowTaint: true,
       useCORS: true
-    }).then(function(canvas){    
-        win.document.write("<img width='100%' style='max-width:400px' crossOrigin='anonymous' src='" + canvas.toDataURL()+"'/>");
+    }).then(function(canvas){
+        if($(window).width() >= 400) win.document.write("<img width='100%' style='max-width:400px' crossOrigin='anonymous' src='" + canvas.toDataURL()+"'/>");
+        else win.document.write("<img width='100%' crossOrigin='anonymous' src='" + canvas.toDataURL()+"'/>");
     });
   }
 
   selectCard(event, i) {
-    this.setState({current: i, currentType: this.state.type, selected: true}, this.updateCard);
+    this.setState({current: i, currentType: this.state.type, selected: true, first: true, text3: ''}, () => {
+      this.updateCard();
+      var key = event.target.querySelector('.primary').innerHTML;
+      if(key.indexOf('最偉大的作品 (Greatest Works of Art)') > -1) {
+        this.setState({easter: true});
+      } else this.setState({easter: false});
+    });
     $('.active').removeClass('active');
     event.target.classList.add('active');
     $('#canvas, #searchBtn').removeClass('hide');
     $('#side').addClass('hide');
+    $('#input3').val('');
   }
 
   updateCard() {
     var url = (this.state.current.images === undefined) ? this.state.current.album.images[1].url : this.state.current.images[1].url;
-    this.setState({url: url});
-    cardImage = (<img crossOrigin="anonymous" src={url} width="100%" className="mw-300" alt="cover"/>);
+    this.setState({url: url}, () => {
+      this.onStyleChange();
+    });
+    cardImage = (<img crossOrigin="anonymous" src={url} width="100%" className={"mw-300 z-1 relative " + (this.state.type === "artist" ? "br-100":"")} alt="cover"/>);
     // $('main').css({'background-color': data.vibrant});
     this.forceUpdate();
   }
@@ -120,11 +137,23 @@ class App extends Component {
   }
 
   onStyleChange(event) {
-    this.setState({
-      style: event.target.value
-    }, () => {
-      console.log(this.state.style);
-    });
+    if(!event) {
+      this.setState({
+        style: "style0"
+      });
+      $('#card').css({'background-color': colors[2]});
+      // $('#mask').css({'background':'linear-gradient(15deg, '+colors[0]+' 0%, '+colors[0]+'00 75% 100%)'});
+    }
+    else {
+      this.setState({
+        style: event.target.value,
+        first: false
+      }, () => {
+        // console.log(this.state.style);
+      });
+      $('#card').css({'background-color': colors[2-parseInt(event.target.value.slice(-1))]});
+      // $('#mask').css({'background':'linear-gradient(15deg, '+colors[parseInt(event.target.value.slice(-1))]+' 0%, '+colors[parseInt(event.target.value.slice(-1))]+'00 75% 100%)'})
+    }
   }
 
   onTyping(key, event) {
@@ -138,9 +167,10 @@ class App extends Component {
       
     } else {
       $t.setState({
-        text2: event.target.value
+        text3: event.target.value
       }, () => {
-          $('#text2').html($t.state.text2);
+          if(!this.state.text3) $('#text3').html('輸入文字訊息');
+          else  $('#text3').html($t.state.text3);
       });
     }
   }
@@ -166,7 +196,7 @@ class App extends Component {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        authorization: 'Bearer Ep86pr_Jl8ofhoZxChaXhQ==',
+        authorization: 'Bearer -Tz7kYZRsykmqxTCSIPMCg==',
       },
     })
       .then(res => res.json())
@@ -180,7 +210,7 @@ class App extends Component {
                 items: result[type+'s'].data,
                 cardType: type
               });
-              console.log(result)
+              // console.log(result)
               $('#results').removeClass('hide');
             },100)
           }
@@ -217,7 +247,7 @@ class App extends Component {
             <div key={item.id} className="card flex items-center pa3 mv2 br3 mr3" onClick={(e) => this.selectCard(e, item)}>
               <img alt="cover" className="br2" src={(item.images === undefined) ? item.album.images[0].url : item.images[0].url} width="80" />
               <div className="dib ph3">
-                <p className="primary ma0">{item.name}</p>
+                <p className="primary ma0 pb1">{item.name}</p>
                 <p className="secondary ma0">{type[this.state.cardType]}</p>
               </div>
             </div>
@@ -232,8 +262,41 @@ class App extends Component {
       )
     }
 
-    var patternImg = {
-      backgroundImage: 'url('+pattern+')',
+    var patternImg1 = {
+      backgroundImage: 'url('+pattern1+')',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundRepeat: 'no-repeat',
+      // width: '100%',
+      // height: '100%',
+      // position: 'absolute',
+      // top: 0,
+      // left: 0
+    }
+    var patternImg2 = {
+      backgroundImage: 'url('+pattern2+')',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundRepeat: 'no-repeat',
+      // width: '100%',
+      // height: '100%',
+      // position: 'absolute',
+      // top: 0,
+      // left: 0
+    }
+    var patternImg3 = {
+      backgroundImage: 'url('+pattern3+')',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundRepeat: 'no-repeat',
+      // width: '100%',
+      // height: '100%',
+      // position: 'absolute',
+      // top: 0,
+      // left: 0
+    }
+    var patternImg4 = {
+      backgroundImage: 'url(https://upload.wikimedia.org/wikipedia/commons/5/5c/Leonardo_da_Vinci%2C_Salvator_Mundi%2C_c.1500%2C_oil_on_walnut%2C_45.4_%C3%97_65.6_cm.jpg)',
       backgroundSize: 'cover',
       backgroundPosition: 'center center',
       backgroundRepeat: 'no-repeat',
@@ -246,8 +309,8 @@ class App extends Component {
 
     let addName = null;
     if(this.state.selected) {
-      if(this.state.currentType === 'track') addName = (<p className="mt2 mb0 f5 o-90">{this.state.current.album.artist.name}</p>)
-      else if(this.state.currentType === 'album') addName = (<p className="mt2 mb0 f5 o-90">{this.state.current.artist.name}</p>)
+      if(this.state.currentType === 'track') addName = (<p className="mv0 f7 o-90">{this.state.current.album.artist.name}</p>)
+      else if(this.state.currentType === 'album') addName = (<p className="mv0 f7 o-90">{this.state.current.artist.name}</p>)
     }
 
     // 三種卡片風格
@@ -262,15 +325,15 @@ class App extends Component {
         glare={false}
         maxGlare={0.8}
       >
-        <div id="card" className="pa5 br3" data-tilt style={patternImg}>
-          <img id="mono" className="z-1" src={mono} width="30" alt="KKBOX" />
-          <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
-            <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
-            <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+        <div id="card" className="cardp br3" data-tilt style={patternImg1}>
+          <img id="mono" className="z-1" src={mono} width="120" alt="KKBOX" />
+          <div id="mask" className="maskp near-white flex items-start flex-column justify-end">
+            <p id="text2" className="mv0 f7 o-70">{type[this.state.currentType] ? type[this.state.currentType] : null}</p>
+            <h1 id="text1" className="relative z-2 mv1 f2">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
             {addName}
           </div>
           {cardImage}
-          <div id="pattern" style={patternImg}></div>
+          <div id="pattern" style={patternImg1}></div>
         </div>
       </Tilty>
       ),
@@ -284,15 +347,15 @@ class App extends Component {
         glare={true}
         maxGlare={0.8}
       >
-        <div id="card" className="pa5 br3" data-tilt style={patternImg}>
-          <img id="mono" src={mono} width="30" alt="KKBOX" />
-          <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
-            <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
-            <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+        <div id="card" className="cardp br3" data-tilt style={patternImg2}>
+          <img id="mono" className="z-1" src={mono} width="120" alt="KKBOX" />
+          <div id="mask" className="maskp near-white flex items-start flex-column justify-end">
+            <p id="text2" className="mv0 f7 o-70">{type[this.state.currentType] ? type[this.state.currentType] : null}</p>
+            <h1 id="text1" className="relative z-2 mv1 f2">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
             {addName}
           </div>
           {cardImage}
-          <div id="pattern" style={patternImg}></div>
+          <div id="pattern" style={patternImg2}></div>
         </div>
       </Tilty>
       ),
@@ -306,15 +369,48 @@ class App extends Component {
         glare={false}
         maxGlare={0.8}
       >
-        <div id="card" className="pa5 br3" data-tilt style={patternImg}>
-          <img id="mono" src={mono} width="30" alt="KKBOX" />
-          <div id="mask" className="pa4 near-white flex items-start flex-column justify-end">
-            <h1 id="text1" className="mv2 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
-            <p id="text2" className="mv0 f6 o-70">{type[this.state.currentType]+' / '+this.state.currentType.substring(0,1).toUpperCase()+this.state.currentType.substring(1)}</p>
+        <div id="card" className="cardp br3" data-tilt style={patternImg3}>
+          <img id="mono" className="z-1" src={mono} width="120" alt="KKBOX" />
+          <div id="mask" className="maskp near-white flex items-center flex-column justify-center">
+            <div className="flex items-center flex-row justify-center">
+              <div className="w-50 mr3">
+                {cardImage}
+              </div>
+              <div>
+                <p id="text2" className="mv0 f7 o-70">{type[this.state.currentType] ? type[this.state.currentType] : null}</p>
+                <h1 id="text1" className="mv1 f3">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
+                {addName}
+              </div>
+            </div>
+            <p id="text3" className={"mt4 f4 white tl w-100 lh-copy "+(this.state.text3 ? "fw6":"o-50")}>{this.state.text3 ? this.state.text3 : "輸入文字訊息"}</p>
+          </div>
+          <div className="o-0">
+            {cardImage}
+          </div>
+          <div id="pattern" style={patternImg3}></div>
+        </div>
+      </Tilty>
+      ),
+      "style3" : (
+      <Tilty 
+        maxTilt={2}
+        perspective={1400}
+        easing="cubic-bezier(.03,.98,.52,.99)"
+        speed={1200}
+        scale={1.05}
+        glare={true}
+        maxGlare={1.8}
+      >
+        <div id="card" className="cardp br3" data-tilt style={patternImg4}>
+          <div className="absolute w-100 top-0 left-0 o-20 h-100 rainbow"></div>
+          <img id="mono" className="z-1" src={mono} width="120" alt="KKBOX" />
+          <div id="mask" className="maskp near-white flex items-start flex-column justify-end">
+            <p id="text2" className="mv0 f7 o-70">{type[this.state.currentType] ? type[this.state.currentType] : null}</p>
+            <h1 id="text1" className="mv1 f2">{this.state.current.name ? this.state.current.name.split('(')[0] : null}</h1>
             {addName}
           </div>
           {cardImage}
-          <div id="pattern" style={patternImg}></div>
+          <div id="pattern" style={patternImg4}></div>
         </div>
       </Tilty>
       )
@@ -329,36 +425,40 @@ class App extends Component {
         <section id="canvas" className="flex justify-center items-center flex-column ph3 hide">
           <div id="maskBG" className="o-20 w-100 h-100 absolute"></div>
           <div className="w-100 mb4-l mb3 z-1">
-            <form className="flex flex-row justify-center mb3">
+            <form className="flex flex-row justify-center">
               <label className="labl">
                 <input id="style0" aria-label="style0" type="radio" name="style" value="style0" onChange={this.onStyleChange} checked={this.state.style === "style0"}/>
-                <div data-tip="風格一" htmlfor="style0" id="c1" className="cp circle br3 bg-near-white"></div>
+                <div data-tip="風格一" htmlFor="style0" id="c1" className="cp circle br3 bg-near-white"></div>
               </label>
               <label className="labl">
                 <input id="style1" aria-label="style1" type="radio" name="style" value="style1" onChange={this.onStyleChange} checked={this.state.style === "style1"}/>
-                <div data-tip="風格二" htmlfor="style1" id="c2" className="cp circle br3 bg-near-white"></div>
+                <div data-tip="風格二" htmlFor="style1" id="c2" className="cp circle br3 bg-near-white"></div>
               </label>
               <label className="labl">
                 <input id="style2" aria-label="style2" type="radio" name="style" value="style2" onChange={this.onStyleChange} checked={this.state.style === "style2"}/>
-                <div data-tip="風格三" htmlfor="style2" id="c3" className="cp circle br3 bg-near-white"></div>
+                <div data-tip="風格三" htmlFor="style2" id="c3" className="cp circle br3 bg-near-white"></div>
+              </label>
+              <label className={"labl "+(this.state.easter ? "db" : "dn")}>
+                <input id="style3" aria-label="style3" type="radio" name="style" value="style3" onChange={this.onStyleChange} checked={this.state.style === "style3"}/>
+                <div data-tip="彩蛋風格" htmlFor="style3" id="c4" className="rainbow cp circle br3 bg-near-white flex justify-center items-center white"></div>
               </label>
             </form>
           </div>
           {card[this.state.style]}
-          <FindColor url={this.state.url}/>
+          <FindColor url={this.state.url} first={this.state.first}/>
           <div className="controls mt4-l mt3 mw-400 z-1 f6">
-            <form>
-              <div className="mv3 flex items-center flex-row">
+            <form id="typing" className={this.state.style === "style2" ? "db":"dn"}>
+              {/*<div className="mv3 flex items-center flex-row">
                 <label className="near-white pr3">標題</label>
                 <input aria-label="title" type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入標題" onChange={(e) => this.onTyping(0, e)}/>
-              </div>
-              <div className="mv3 flex items-center flex-row">
+              </div>*/}
+              <div className="mb3 flex items-center flex-row">
                 <label className="near-white pr3 mv2">內文</label>
-                <input aria-label="content" type="text" className="textbox flex-grow-1 h40 o-80" placeholder="輸入內文" onChange={(e) => this.onTyping(1, e)}/>
+                <input aria-label="content" maxlength="60" type="text" id="input3" className="textbox flex-grow-1 h40 o-80" placeholder="輸入文字訊息" onChange={(e) => this.onTyping(1, e)}/>
               </div>
             </form>
           </div>
-          <div className="controls w-100 mw-400 flex flex-row items-center relative z-1 f6">
+          <div className="controls w-100 mw-400 flex flex-row items-center relative z-1 f6 ">
             <label className="near-white pr3 mv2 flex-shrink-0">分享</label>
             <input aria-label="url" data-tip={"複製"+type[this.state.cardType]+"連結"} className="flex-grow-1 cp textbox h40 o-80" id="url" type="text" value={this.state.current.url} readOnly="readonly" onClick={this.copyURL}></input>
             <img id="check" src={check} width="24" className="absolute" alt="check"/>
@@ -373,7 +473,7 @@ class App extends Component {
           <div className="center mv4">
             <a href="."><img src={logo} width="120" alt="KKCards"/></a>
           </div>
-          <form action='javascript:void(0);' className="bb b--white-40">
+          <form action="javascript:void(0);" className="bb b--white-40">
             <div className="ph4 relative">
               <input aria-label="search" id="input" className="db pa2 mb4 w-100 near-white" type="text" placeholder="輸入關鍵字搜尋" autoComplete="off" onChange={this.onInputChange}/>
               <img src={search} width="24" className="absolute" alt="search"/>
@@ -416,10 +516,17 @@ function FindColor(props) {
     'filter': 'blur(1.5rem)',
     'pointerEvents': 'none'
   })
-  $('#card').css({'background-color': data.darkVibrant});
-  $('#c1').css({'background-color': data.lightMuted});
-  $('#c2').css({'background-color': data.muted});
-  $('#c3').css({'background-color': data.darkMuted});
-  $('#mask').css({'background':'linear-gradient(15deg, '+data.darkVibrant+' 0%, '+data.darkVibrant+'00 75% 100%)'})
+
+  colors = [data.darkVibrant, data.muted, data.darkMuted, data.lightVibrant, data.Vibrant, data.lightMuted];
+
+  $('#c1').css({'background-color': colors[2]});
+  $('#c2').css({'background-color': colors[1]});
+  $('#c3').css({'background-color': colors[0]});
+
+  if(props.first) {
+    $('#card').css({'background-color': colors[2]});
+    // $('#mask').css({'background':'linear-gradient(15deg, '+colors[0]+' 0%, '+colors[0]+'00 75% 100%)'});
+  }
+
   return true;
 }
