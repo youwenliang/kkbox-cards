@@ -78,6 +78,121 @@ main {
     );
 }
 
+#looping {
+  width: 100vw;
+  min-width: 1440px;
+  display: flex;
+  justify-content: center;
+  filter: blur(2px);
+}
+
+#looping img {
+  width: 20vw;
+  min-width: 288px;
+  margin: 0 10px;
+  position: relative;
+}
+
+#looping img:nth-child(1) {
+  animation: loop-1 100s linear infinite;
+}
+
+#looping img:nth-child(2) {
+  animation: loop-2 100s linear infinite;
+}
+
+#looping img:nth-child(3) {
+  animation: loop-3 100s linear infinite;
+}
+
+#looping img:nth-child(4) {
+  animation: loop-4 100s linear infinite;
+}
+
+#looping img:nth-child(5) {
+  animation: loop-5 100s linear infinite;
+}
+
+.lh-normal {
+	line-height: 1.5 !important;
+}
+.lh-copy {
+	line-height: 1.8 !important;
+}
+
+
+@media screen and (max-width: 900px) {
+  #looping {
+    min-width: 400px;
+  }
+  #looping img {
+    width: 33.33vw;
+    min-width: 133.33px;
+    margin: 0 5px;
+  }
+  #looping img:first-child,
+  #looping img:last-child {
+    display: none;
+  }
+  #looping img:nth-child(1) {
+	  animation: loop-1 60s linear infinite;
+	}
+
+	#looping img:nth-child(2) {
+	  animation: loop-2 60s linear infinite;
+	}
+
+	#looping img:nth-child(3) {
+	  animation: loop-3 60s linear infinite;
+	}
+
+	#looping img:nth-child(4) {
+	  animation: loop-4 60s linear infinite;
+	}
+
+	#looping img:nth-child(5) {
+	  animation: loop-5 60s linear infinite;
+	}
+}
+
+@keyframes loop-1 {
+  from {
+    top:25% }
+
+  to {
+    top: -25%; } 
+}
+
+@keyframes loop-2 {
+  from {
+    top:-20% }
+
+  to {
+    top: 30%; } 
+}
+@keyframes loop-3 {
+  from {
+    top:20% }
+
+  to {
+    top: -30%; } 
+}
+
+@keyframes loop-4 {
+  from {
+    top:-25% }
+
+  to {
+    top: 25%; } 
+}
+@keyframes loop-5 {
+  from {
+    top: 35% }
+
+  to {
+    top: -15%; } 
+}
+
 #card {
 	transition: all .2s ease-in-out;
 	/*box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;*/
@@ -126,6 +241,14 @@ img {
 	width: 360px;
 	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
 	transition: all .6s ease-in-out;
+}
+
+.mask-black {
+	transition: all .6s ease-in-out;	
+}
+
+.pn {
+	pointer-events: none;
 }
 
 .card {
@@ -252,11 +375,11 @@ input:focus, textarea:focus, select:focus{
 	background-color: #09cef6;
 	border-radius: 40px;
 	color: #111111;
-	width: 120px;
+	width: 200px;
 	border: none;
 	cursor: pointer;
 	outline: inherit;
-	padding: 0 16px;
+	padding: 24px;
 	box-shadow: rgba(0,0,0,0.08) 0 4px 6px 0, rgba(0,0,0,0.16) 0 1px 10px 0;
 	transition: all .2s ease-in-out;
 }

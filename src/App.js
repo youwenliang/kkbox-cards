@@ -15,6 +15,14 @@ import html2canvas from 'html2canvas';
 import ReactTooltip from 'react-tooltip';
 import searchStatus from './images/search.png';
 import emptyStatus from './images/empty.png';
+import slide1 from './images/Slide1.png';
+import slide2 from './images/Slide2.png';
+import slide3 from './images/Slide3.png';
+import slide4 from './images/Slide4.png';
+import slide5 from './images/Slide5.png';
+import loading from './images/loading.gif';
+import loadImage from 'image-promise';
+
 
 var type = {
   'artist': '歌手',
@@ -66,7 +74,22 @@ class App extends Component {
     this.updateCard = this.updateCard.bind(this);
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
+    const images = [logo, slide1, slide2, slide3, slide4, slide5];
+     
+    loadImage(images)
+    .then(function (allImgs) {
+        console.log(allImgs.length, 'images loaded!', allImgs);
+        setTimeout(function(){
+          $('.mask-black').addClass('o-0 pn');
+        }, 1000);
+    })
+    .catch(function (err) {
+        console.error('One or more images have failed to load :(');
+        console.error(err.errored);
+        console.info('But these loaded fine:');
+        console.info(err.loaded);
+    });
   }
 
   // Custom Functions
@@ -382,7 +405,7 @@ class App extends Component {
                 {addName}
               </div>
             </div>
-            <p id="text3" className={"mt4 f4 white tl w-100 lh-copy "+(this.state.text3 ? "fw6":"o-50")}>{this.state.text3 ? this.state.text3 : "輸入文字訊息"}</p>
+            <p id="text3" className={"mt4 f4 white tl w-100 lh-normal "+(this.state.text3 ? "fw6":"o-50")}>{this.state.text3 ? this.state.text3 : "輸入文字訊息"}</p>
           </div>
           <div className="o-0">
             {cardImage}
@@ -418,9 +441,26 @@ class App extends Component {
 
     return (
       <main>
-        <div id="home" className="absolute top0 left0 vh-100 w-100 flex bg-near-black flex-column justify-center items-center z-2">
-          <h1 className="near-white">最偉大的作品</h1>
-          <button className="db flex items-center justify-center fw5 h40 flex-shrink-0 black primaryBtn" onClick={this.nextPage}>開始製作</button>
+        <div id="home" className="absolute top0 left0 vh-100 w-100 flex bg-black flex-column justify-center items-center z-2">
+          <div className="mask-black bg-black w-100 h-100 absolute top-0 left-0 z-2 flex justify-center items-center">
+            <img src={loading} width="80" alt="loading"/>
+          </div>
+          <div id="looping" className="o-30">
+            <img src={slide1} width="100%" alt="arts"/>
+            <img src={slide2} width="100%" alt="arts"/>
+            <img src={slide3} width="100%" alt="arts"/>
+            <img src={slide4} width="100%" alt="arts"/>
+            <img src={slide5} width="100%" alt="arts"/>
+          </div>
+          <div className="absolute flex justify-center flex-column items-center">
+            <h1 className="near-white">
+              <img src={logo} width="240" alt="KKCards"/>
+            </h1>
+            <p className="white ph5 lh-copy mw6">你不僅是音樂創作者，你同時還必須是行銷人員、創意總監、籌備人員，甚至是業餘的平面設計師。</p>
+            <p className="white ph5 lh-copy mw6">我們希望讓你更輕鬆地建立可分享的吸睛社群媒體資產，讓你增加聽眾並慶祝成功。 </p>
+            <button className="db mt3 flex items-center justify-center fw6 h40 flex-shrink-0 black primaryBtn" onClick={this.nextPage}>開始製作</button>
+            <p className="near-white f6">Made by 最偉大的作品</p>
+          </div>
         </div>
         <section id="canvas" className="flex justify-center items-center flex-column ph3 hide">
           <div id="maskBG" className="o-20 w-100 h-100 absolute"></div>
@@ -454,7 +494,7 @@ class App extends Component {
               </div>*/}
               <div className="mb3 flex items-center flex-row">
                 <label className="near-white pr3 mv2">內文</label>
-                <input aria-label="content" maxlength="60" type="text" id="input3" className="textbox flex-grow-1 h40 o-80" placeholder="輸入文字訊息" onChange={(e) => this.onTyping(1, e)}/>
+                <input aria-label="content" maxLength="60" type="text" id="input3" className="textbox flex-grow-1 h40 o-80" placeholder="輸入文字訊息" onChange={(e) => this.onTyping(1, e)}/>
               </div>
             </form>
           </div>
